@@ -6,7 +6,8 @@
    Dial design
 -----------------------------------------------------------*/
 #define MAINDIAL_IS_OUTSIDE //Comment out this definition and Sub dial is outsaide
-//#define REV_DIAL
+
+#define REV_DIAL
 //#define MAIN_UNIT_kHz
 
 #define MODE0 // MODE0, MODE1, MODE2
@@ -148,4 +149,4 @@ public:
 
 
 
-#endif	/* PRM_H */
+#endif

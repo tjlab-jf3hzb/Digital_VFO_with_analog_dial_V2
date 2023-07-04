@@ -149,4 +149,4 @@ public:
   }
 };
 
-#endif	/* LCD_H */
+#endif

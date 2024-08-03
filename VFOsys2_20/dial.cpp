@@ -23,6 +23,7 @@ void LCD_setup(void)
     sprites[i].setTextDatum(textdatum_t::top_right);
   }
 
+///*
   int div = 1;
   for (;;)
   {
@@ -39,6 +40,13 @@ void LCD_setup(void)
     }
     div++;
   }
+//*/
+/*
+  int div = 2;  //try 1,2,3,4,...
+  sprite_height = (lcd.height() + div - 1) / div;  
+  sprites[0].createSprite(lcd.width(), sprite_height);
+  sprites[1].createSprite(lcd.width(), sprite_height);
+*/
 
   sp.setColorDepth(16);
   //sp.setFont(&fonts::Font6);
@@ -99,7 +107,7 @@ void DIAL::draw(int32_t freq, int yoff)
   // draw Sub dial ----------------------------------------------------------------
   #ifdef REV_DIAL
   angle = -resoSub * (float)( freq % (TickResoSub*10) ) / (float)TickResoSub ;
-  #else
+  #else if
   angle = resoSub * (float)( freq % (TickResoSub*10) ) / (float)TickResoSub ;
   #endif
 
@@ -157,7 +165,7 @@ void DIAL::draw(int32_t freq, int yoff)
   {
     #ifdef REV_DIAL
     float a = angle + (float)i * resoSub;
-    #else
+    #else if
     float a = angle - (float)i * resoSub;
     #endif
 
@@ -187,7 +195,7 @@ void DIAL::draw(int32_t freq, int yoff)
   // draw Main dial -----------------------------------------------------------------------
   #ifdef REV_DIAL
   angle = -resoMain * (float)( freq % (TickResoMain*10) ) / (float)TickResoMain;
-  #else
+  #else if
   angle = resoMain * (float)( freq % (TickResoMain*10) ) / (float)TickResoMain;
   #endif
 
@@ -246,7 +254,7 @@ void DIAL::draw(int32_t freq, int yoff)
   {
     #ifdef REV_DIAL
     float a = angle + (float)i * resoMain;
-    #else
+    #else if
     float a = angle - (float)i * resoMain;
     #endif
 
@@ -255,7 +263,7 @@ void DIAL::draw(int32_t freq, int yoff)
 
     #ifdef MAIN_UNIT_kHz
       num = abs(freq)/(100000)*100 + i*10;
-    #else
+    #else if
       numf = ( abs(freq)/(TickResoMain*10) + i*0.1f ) * 1e-5 * TickResoMain;
     #endif
 
@@ -263,14 +271,14 @@ void DIAL::draw(int32_t freq, int yoff)
     if(tnMain<=0){
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num, sp.width()>>1, 0);
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, sp.width()>>1, 0);
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, sp.width()>>1, 0);
       #endif
     }else{
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num, sp.width()>>1, sp.height()-1);
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, sp.width()>>1, sp.height()-1);
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, sp.width()>>1, sp.height()-1);
       #endif
     }
     #endif
@@ -279,14 +287,14 @@ void DIAL::draw(int32_t freq, int yoff)
     if(tnMain<=0){
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num, 0, sp.height()>>1);
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, 0, sp.height()>>1  );
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, 0, sp.height()>>1  );
       #endif
     }else{
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num, sp.width(), sp.height()>>1 );
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, sp.width(), sp.height()>>1  );
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, sp.width(), sp.height()>>1  );
       #endif
     }
     #endif
@@ -295,14 +303,14 @@ void DIAL::draw(int32_t freq, int yoff)
     if(tnMain<=0){
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num, sp.width(), sp.height()>>1 );
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, sp.width(), sp.height()>>1  );
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, sp.width(), sp.height()>>1  );
       #endif
     }else{
       #ifdef MAIN_UNIT_kHz
       if(num>=0) sp.drawNumber( num,  0, sp.height()>>1  );
-      #else
-      if(numf>=0) sp.drawFloat( fabs(numf), 1, 0, sp.height()>>1  );
+      #else if
+      if(numf>=-0.01) sp.drawFloat( fabs(numf), 1, 0, sp.height()>>1  );
       #endif
     }
     #endif
@@ -311,6 +319,69 @@ void DIAL::draw(int32_t freq, int yoff)
   }
 
   sp.setTextDatum(textdatum_t::middle_center);
+
+
+  // Lamp emulation
+  std::uint16_t* rawbuf = (std::uint16_t*)sprites[flip].getBuffer();
+  int xr;
+  int yr;
+  float distance;
+  float rlamp;
+  uint16_t pixdata;
+  float r, g, b;
+  float d_max, d_min;
+
+  for (int y = 0; y < sprite_height; y++)
+  {
+    std::uint16_t* rawline = &rawbuf[y * lcd.width()];
+    for (int x = 0; x < lcd.width(); x++)
+    {
+
+      if(rawline[x]!=0)
+      {
+        xr=abs(x-lampX);
+        yr=abs(y+yoff-lampY);
+        if(xr>yr)
+        {
+          d_max=(float)xr;
+          d_min=(float)yr;
+        } else {
+          d_max=(float)yr;
+          d_min=(float)xr;
+        }
+        if( 2 * d_max < 5 * d_min )
+        {
+          distance = 0.8437500f * d_max + 0.5556641f * d_min;
+        } else {
+          distance = 0.9921875f * d_max + 0.1855469f * d_min;
+        }
+   
+
+        rlamp = 1.0f - (depth_LE_effect*0.001)*(distance-lampD);
+        if(rlamp<1.0f)
+        {
+          if(rlamp<=0)
+          {
+            rawline[x] = 0;
+          }
+          else
+          {
+            pixdata = rawline[x];
+            pixdata = pixdata>>8 | pixdata<<8;
+            r = rlamp*(float)( (pixdata&0xF800)>>8 );
+            g = rlamp*(float)( (pixdata&0x07E0)>>3 );
+            b = rlamp*(float)( (pixdata&0x001F)<<3 );
+            rawline[x] = lcd.swap565((uint8_t)(r+0.5f), (uint8_t)(g+0.5f), (uint8_t)(b+0.5f) );
+          }
+        }
+      }
+
+    }
+  }
+
+  //Serial.println(rawbuf[0]);
+
+
 
   // draw Pointer --------------------------------------------------------------------------------------------------
   sp.createSprite(1, 1);

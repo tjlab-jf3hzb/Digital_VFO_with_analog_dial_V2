@@ -14,7 +14,7 @@
 
 #define SDA    21
 #define SCL    22
-#define fxtal (25005328)
+#define fxtal (25000000)
 
 #define pi 3.14159265359
 #define PH (pi/2) // PH=90deg

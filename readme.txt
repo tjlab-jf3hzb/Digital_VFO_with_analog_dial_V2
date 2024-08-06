@@ -19,7 +19,9 @@ Ver. 2.20  Aug. 3, 2024
        #define lampD 50   // Spot size(diameter)
        #define depth_LE_effect 7.5 // if 0, without Lamp emulation
 
-
+Ver. 2.21  Aug. 7, 2024
+  Improved display quality
+  
 
 
 JF3HZB  T. Uebo

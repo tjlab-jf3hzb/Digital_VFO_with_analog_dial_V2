@@ -21,6 +21,9 @@ Ver. 2.20  Aug. 3, 2024
 
 Ver. 2.21  Aug. 7, 2024
   Improved display quality
+
+Ver. 2.22  Aug. 8, 2024
+  Improved display quality for ST7789
   
 
 

@@ -37,7 +37,7 @@
 
 
 //メインダイアル1目盛あたりの周波数 ----------------------------------------------------------
-#define  freq_tick_main 10000 // Frequency per tick of Main dial: 10000(10kHz) or 100000(100kHz)
+#define  freq_tick_main 10000  // Frequency per tick of Main dial: 10000(10kHz) or 100000(100kHz)
 #define  freq_tick_sub  1000  // Frequency per tick of Sub  dial: 1000(1kHz) or 10000(10kHz)
 
 
